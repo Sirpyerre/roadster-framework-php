@@ -1,0 +1,244 @@
+# Roadster Framework - .gitignore
+
+#############
+# PHP
+#############
+# Composer
+/vendor/
+composer.phar
+composer.lock
+
+# PHPUnit
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+phpunit.xml
+
+# PHPStan
+phpstan.neon.dist
+.phpstan-cache/
+
+# PHP CS Fixer
+.php-cs-fixer.cache
+.php_cs.cache
+
+#############
+# Environment
+#############
+.env
+.env.local
+.env.*.local
+!.env.example
+
+#############
+# RoadRunner
+#############
+# Binary
+rr
+roadrunner
+roadrunner.exe
+
+# Logs
+*.log
+logs/
+storage/logs/
+
+# PID files
+*.pid
+
+# RoadRunner cache
+.rr/
+.roadrunner/
+
+#############
+# IDE
+#############
+# PhpStorm / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+#############
+# macOS
+#############
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+#############
+# Windows
+#############
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+#############
+# Linux
+#############
+*~
+.directory
+.Trash-*
+
+#############
+# Backups
+#############
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.tmp
+
+#############
+# Build / Cache
+#############
+# Compiled files
+*.cache
+.cache/
+build/
+dist/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+#############
+# Testing
+#############
+# Coverage reports
+coverage.xml
+clover.xml
+.coverage
+htmlcov/
+
+# Test databases
+*.sqlite
+*.sqlite3
+*.db
+
+#############
+# Docker
+#############
+# Local docker files
+docker-compose.override.yml
+.docker/
+
+#############
+# Node (si usas frontend)
+#############
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+#############
+# Assets compilados
+#############
+public/build/
+public/hot
+public/storage
+public/mix-manifest.json
+
+#############
+# Roadster specific
+#############
+# Generated routes cache
+config/routes.cache.php
+
+# Container cache
+config/container.cache.php
+
+# Compiled container
+var/cache/
+var/container/
+
+# User-specific config
+config/local.php
+
+# Storage
+storage/app/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+!storage/app/.gitkeep
+!storage/framework/cache/.gitkeep
+!storage/framework/sessions/.gitkeep
+!storage/framework/testing/.gitkeep
+!storage/framework/views/.gitkeep
+
+#############
+# CI/CD
+#############
+.gitlab-ci-local/
+
+#############
+# Security
+#############
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Credentials
+credentials.json
+secrets.json
+auth.json
+
+#############
+# Misc
+#############
+# Sass
+.sass-cache/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Patches
+*.patch
+*.diff
+
+# Documentation build
+docs/_build/
+docs/.buildinfo
+docs/.doctrees/

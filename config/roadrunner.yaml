@@ -1,0 +1,28 @@
+version: "3"
+
+server:
+  command: "php public/index.php"
+  relay: pipes
+
+http:
+  address: "${SERVER_HOST:-0.0.0.0}:${SERVER_PORT:-8080}"
+  middleware: []
+  pool:
+    num_workers: ${RR_WORKERS:-4}
+    max_jobs: ${RR_MAX_JOBS:-1000}
+    supervisor:
+      max_worker_memory: 128
+
+logs:
+  mode: ${APP_ENV:-development}
+  level: ${LOG_LEVEL:-debug}
+  encoding: json
+  output: stdout
+
+reload:
+  interval: 1s
+  patterns: [".php"]
+  services:
+    http:
+      recursive: true
+      dirs: ["src", "config"]

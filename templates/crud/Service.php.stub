@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roadster\Domain\{{resource}};
+
+final class {{resource}}Service
+{
+    public function __construct(
+        private {{resource}}RepositoryInterface $repository,
+    ) {
+    }
+
+    /**
+     * @return array<{{resource}}>
+     */
+    public function findAll(): array
+    {
+        return $this->repository->findAll();
+    }
+
+    public function findById(string $id): ?{{resource}}
+    {
+        return $this->repository->findById($id);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function create(array $data): {{resource}}
+    {
+        $item = new {{resource}}($data);
+
+        return $this->repository->save($item);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function update(string $id, array $data): ?{{resource}}
+    {
+        $item = $this->repository->findById($id);
+
+        if ($item === null) {
+            return null;
+        }
+
+        $item->update($data);
+
+        return $this->repository->save($item);
+    }
+
+    public function delete(string $id): bool
+    {
+        return $this->repository->delete($id);
+    }
+}

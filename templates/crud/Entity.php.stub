@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roadster\Domain\{{resource}};
+
+final class {{resource}} implements \JsonSerializable
+{
+    private string $id;
+    private string $name;
+    private \DateTimeImmutable $createdAt;
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __construct(array $data = [])
+    {
+        $this->id = $data['id'] ?? $this->generateId();
+        $this->name = $data['name'] ?? '';
+        $this->createdAt = isset($data['createdAt'])
+            ? new \DateTimeImmutable($data['createdAt'])
+            : new \DateTimeImmutable();
+
+        if (isset($data['updatedAt'])) {
+            $this->updatedAt = new \DateTimeImmutable($data['updatedAt']);
+        }
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function update(array $data): void
+    {
+        if (isset($data['name'])) {
+            $this->name = $data['name'];
+        }
+
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'updatedAt' => $this->updatedAt?->format(\DateTimeInterface::ATOM),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return $this->jsonSerialize();
+    }
+
+    private function generateId(): string
+    {
+        return bin2hex(random_bytes(16));
+    }
+}

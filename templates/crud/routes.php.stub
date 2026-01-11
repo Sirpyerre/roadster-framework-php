@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+use Mezzio\Application;
+use Mezzio\MiddlewareFactory;
+use Psr\Container\ContainerInterface;
+use Roadster\Web\Rest\{{resource}}\Index{{resource}}Handler;
+use Roadster\Web\Rest\{{resource}}\Create{{resource}}Handler;
+use Roadster\Web\Rest\{{resource}}\Show{{resource}}Handler;
+use Roadster\Web\Rest\{{resource}}\Update{{resource}}Handler;
+use Roadster\Web\Rest\{{resource}}\Delete{{resource}}Handler;
+
+return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
+    $app->get('/api/{{routeName}}', Index{{resource}}Handler::class, '{{routeName}}.index');
+    $app->post('/api/{{routeName}}', Create{{resource}}Handler::class, '{{routeName}}.create');
+    $app->get('/api/{{routeName}}/{id}', Show{{resource}}Handler::class, '{{routeName}}.show');
+    $app->put('/api/{{routeName}}/{id}', Update{{resource}}Handler::class, '{{routeName}}.update');
+    $app->delete('/api/{{routeName}}/{id}', Delete{{resource}}Handler::class, '{{routeName}}.delete');
+};

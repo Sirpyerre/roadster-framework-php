@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roadster\Domain\{{resource}};
+
+interface {{resource}}RepositoryInterface
+{
+    /**
+     * @return array<{{resource}}>
+     */
+    public function findAll(): array;
+
+    public function findById(string $id): ?{{resource}};
+
+    public function save({{resource}} ${{variableName}}): {{resource}};
+
+    public function delete(string $id): bool;
+}

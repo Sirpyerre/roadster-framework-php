@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roadster\Domain\{{domain}};
+
+final class {{className}}Service
+{
+    public function __construct(
+        // Inject repositories here
+    ) {
+    }
+
+    // Add business logic methods
+}

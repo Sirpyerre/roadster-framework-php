@@ -14,10 +14,6 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // Health check endpoint
     $app->get('/health', HealthCheckHandler::class, 'health');
 
-    // Add your routes here
-    // $app->get('/api/users', UserIndexHandler::class, 'users.index');
-    // $app->post('/api/users', UserCreateHandler::class, 'users.create');
-    // $app->get('/api/users/{id}', UserShowHandler::class, 'users.show');
-    // $app->put('/api/users/{id}', UserUpdateHandler::class, 'users.update');
-    // $app->delete('/api/users/{id}', UserDeleteHandler::class, 'users.delete');
+    // TODO API routes
+    (require configPath('routes/todo.php'))($app, $factory, $container);
 };

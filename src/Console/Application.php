@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace Roadster\Console;
 
 use Roadster\Console\Commands\InitCommand;
+use Roadster\Console\Commands\MakeHandlerCommand;
+use Roadster\Console\Commands\MakeMiddlewareCommand;
+use Roadster\Console\Commands\MakeServiceCommand;
 use Roadster\Console\Commands\RoutesListCommand;
+use Roadster\Console\Commands\ScaffoldCrudCommand;
 use Roadster\Console\Commands\ServeCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
@@ -24,9 +28,16 @@ final class Application extends SymfonyApplication
     private function registerCommands(): void
     {
         $this->addCommands([
+            // Server commands
             new InitCommand(),
             new ServeCommand(),
             new RoutesListCommand(),
+
+            // Generator commands
+            new MakeHandlerCommand(),
+            new MakeServiceCommand(),
+            new MakeMiddlewareCommand(),
+            new ScaffoldCrudCommand(),
         ]);
     }
 }

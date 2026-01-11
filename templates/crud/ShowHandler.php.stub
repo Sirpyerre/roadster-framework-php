@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roadster\Web\Rest\{{resource}};
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Roadster\Domain\{{resource}}\{{resource}}Service;
+
+final class Show{{resource}}Handler implements RequestHandlerInterface
+{
+    public function __construct(
+        private {{resource}}Service $service,
+    ) {
+    }
+
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $id = $request->getAttribute('id');
+
+        $item = $this->service->findById($id);
+
+        if ($item === null) {
+            return jsonResponse(['error' => '{{resource}} not found'], 404);
+        }
+
+        return jsonResponse([
+            'data' => $item,
+        ]);
+    }
+}

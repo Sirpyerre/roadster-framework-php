@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roadster\App\Middleware;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+final class {{className}}Middleware implements MiddlewareInterface
+{
+    public function __construct(
+        // Inject dependencies here
+    ) {
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        // Before handling request
+        // ...
+
+        $response = $handler->handle($request);
+
+        // After handling request
+        // ...
+
+        return $response;
+    }
+}

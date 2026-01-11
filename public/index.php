@@ -14,6 +14,7 @@ use Mezzio\Router\Middleware\ImplicitOptionsMiddleware;
 use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Roadster\App\Container\ContainerFactory;
+use Roadster\App\Middleware\BodyParamsMiddleware;
 use Roadster\App\Middleware\ErrorHandlerMiddleware;
 use Roadster\App\Middleware\JsonResponseMiddleware;
 use Spiral\RoadRunner\Http\PSR7Worker;
@@ -35,6 +36,7 @@ $factory = $container->get(MiddlewareFactory::class);
 // Set up the middleware pipeline
 $app->pipe(ErrorHandlerMiddleware::class);
 $app->pipe(JsonResponseMiddleware::class);
+$app->pipe(BodyParamsMiddleware::class);
 $app->pipe(RouteMiddleware::class);
 $app->pipe(ImplicitHeadMiddleware::class);
 $app->pipe(ImplicitOptionsMiddleware::class);

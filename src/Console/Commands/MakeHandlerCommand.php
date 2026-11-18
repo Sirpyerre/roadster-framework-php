@@ -42,11 +42,8 @@ final class MakeHandlerCommand extends Command
         $namespace = !empty($parts) ? '\\' . implode('\\', $parts) : '';
         $directory = !empty($parts) ? '/' . implode('/', $parts) : '';
 
-        // Ensure className ends with Handler if not already
-        if (!str_ends_with($className, 'Handler')) {
-            $className .= 'Handler';
-        } else {
-            // Remove Handler suffix for template replacement
+        // Remove Handler suffix if present (will be added to filename)
+        if (str_ends_with($className, 'Handler')) {
             $className = substr($className, 0, -7);
         }
 

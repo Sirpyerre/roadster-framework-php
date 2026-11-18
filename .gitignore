@@ -207,6 +207,9 @@ var/container/
 # User-specific config
 config/local.php
 
+# JSON file store lock files
+storage/*.lock
+
 # Storage
 storage/app/*
 storage/framework/cache/*

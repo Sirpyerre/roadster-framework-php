@@ -6,15 +6,15 @@ namespace Roadster\Infrastructure\Todo;
 
 use Roadster\Domain\Todo\Todo;
 use Roadster\Domain\Todo\TodoRepositoryInterface;
+use Roadster\Infrastructure\Storage\JsonFileStore;
 
 final class JsonTodoRepository implements TodoRepositoryInterface
 {
-    private string $filePath;
+    private JsonFileStore $store;
 
     public function __construct(?string $filePath = null)
     {
-        $this->filePath = $filePath ?? basePath('storage/todos.json');
-        $this->ensureStorageExists();
+        $this->store = new JsonFileStore($filePath ?? basePath('storage/todos.json'));
     }
 
     /**
@@ -22,19 +22,15 @@ final class JsonTodoRepository implements TodoRepositoryInterface
      */
     public function findAll(): array
     {
-        $data = $this->readData();
-
         return array_map(
             fn(array $item) => new Todo($item),
-            $data
+            $this->store->read()
         );
     }
 
     public function findById(string $id): ?Todo
     {
-        $data = $this->readData();
-
-        foreach ($data as $item) {
+        foreach ($this->store->read() as $item) {
             if ($item['id'] === $id) {
                 return new Todo($item);
             }
@@ -45,83 +41,38 @@ final class JsonTodoRepository implements TodoRepositoryInterface
 
     public function save(Todo $todo): Todo
     {
-        $data = $this->readData();
-        $found = false;
+        $this->store->transaction(function (array $data) use ($todo): array {
+            foreach ($data as $index => $item) {
+                if ($item['id'] === $todo->getId()) {
+                    $data[$index] = $todo->toArray();
 
-        foreach ($data as $index => $item) {
-            if ($item['id'] === $todo->getId()) {
-                $data[$index] = $todo->toArray();
-                $found = true;
-                break;
+                    return $data;
+                }
             }
-        }
 
-        if (!$found) {
             $data[] = $todo->toArray();
-        }
 
-        $this->writeData($data);
+            return $data;
+        });
 
         return $todo;
     }
 
     public function delete(string $id): bool
     {
-        $data = $this->readData();
-        $initialCount = count($data);
+        $deleted = false;
 
-        $data = array_values(array_filter(
-            $data,
-            fn(array $item) => $item['id'] !== $id
-        ));
+        $this->store->transaction(function (array $data) use ($id, &$deleted): ?array {
+            $remaining = array_values(array_filter(
+                $data,
+                fn(array $item) => $item['id'] !== $id
+            ));
 
-        if (count($data) === $initialCount) {
-            return false;
-        }
+            $deleted = count($remaining) !== count($data);
 
-        $this->writeData($data);
+            return $deleted ? $remaining : null;
+        });
 
-        return true;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function readData(): array
-    {
-        if (!file_exists($this->filePath)) {
-            return [];
-        }
-
-        $content = file_get_contents($this->filePath);
-
-        if ($content === false || $content === '') {
-            return [];
-        }
-
-        $data = json_decode($content, true);
-
-        return is_array($data) ? $data : [];
-    }
-
-    /**
-     * @param array<int, array<string, mixed>> $data
-     */
-    private function writeData(array $data): void
-    {
-        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
-        if ($json !== false) {
-            file_put_contents($this->filePath, $json);
-        }
-    }
-
-    private function ensureStorageExists(): void
-    {
-        $dir = dirname($this->filePath);
-
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
+        return $deleted;
     }
 }

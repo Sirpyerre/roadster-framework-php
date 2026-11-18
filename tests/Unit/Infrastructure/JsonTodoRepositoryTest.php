@@ -15,6 +15,10 @@ describe('JsonTodoRepository', function () {
         if (file_exists($this->testFile)) {
             unlink($this->testFile);
         }
+
+        if (file_exists($this->testFile . '.lock')) {
+            unlink($this->testFile . '.lock');
+        }
     });
 
     it('returns empty array when no todos exist', function () {
@@ -77,5 +81,20 @@ describe('JsonTodoRepository', function () {
 
         expect($todos)->toHaveCount(1);
         expect($todos[0]->getTitle())->toBe('Persistent Todo');
+    });
+
+    it('throws when reading a corrupt file', function () {
+        file_put_contents($this->testFile, '{not json');
+
+        expect(fn() => $this->repository->findAll())->toThrow(RuntimeException::class);
+        expect(fn() => $this->repository->findById('1'))->toThrow(RuntimeException::class);
+    });
+
+    it('does not overwrite a corrupt file on save or delete', function () {
+        file_put_contents($this->testFile, '{not json');
+
+        expect(fn() => $this->repository->save(new Todo(['title' => 'New'])))->toThrow(RuntimeException::class);
+        expect(fn() => $this->repository->delete('1'))->toThrow(RuntimeException::class);
+        expect(file_get_contents($this->testFile))->toBe('{not json');
     });
 });

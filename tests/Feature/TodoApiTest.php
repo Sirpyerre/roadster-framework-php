@@ -10,6 +10,8 @@ use Roadster\Web\Rest\Todo\UpdateTodoHandler;
 use Roadster\Web\Rest\Todo\DeleteTodoHandler;
 use Roadster\Domain\Todo\TodoService;
 use Roadster\Domain\Todo\TodoRepositoryInterface;
+use Roadster\App\Middleware\ErrorHandlerMiddleware;
+use Roadster\Infrastructure\Todo\JsonTodoRepository;
 
 function createTodoService(TodoRepositoryInterface $repository): TodoService
 {
@@ -200,5 +202,28 @@ describe('Todo API Handlers', function () {
 
             expect($response->getStatusCode())->toBe(404);
         });
+    });
+});
+
+describe('Todo API with a corrupt storage file', function () {
+    it('returns a generic 500 JSON error', function () {
+        $path = sys_get_temp_dir() . '/roadster_corrupt_' . uniqid() . '.json';
+        file_put_contents($path, '{not json');
+
+        try {
+            $handler = new IndexTodoHandler(createTodoService(new JsonTodoRepository($path)));
+            $response = (new ErrorHandlerMiddleware(false))->process(createRequest('GET', '/api/todos'), $handler);
+
+            expect($response->getStatusCode())->toBe(500);
+            expect($response)->toBeJsonResponse();
+
+            $body = json_decode((string) $response->getBody(), true);
+            expect($body['error'])->toBeTrue();
+            expect($body['message'])->toBe('Internal Server Error');
+            expect(file_get_contents($path))->toBe('{not json');
+        } finally {
+            @unlink($path);
+            @unlink($path . '.lock');
+        }
     });
 });

@@ -1,0 +1,29 @@
+schema: spec-driven
+
+# Project context shown to AI when creating artifacts.
+context: |
+  Project: Roadster, an ultralight PHP framework optimized for RoadRunner, built for high-performance REST APIs (MVP, v0.1). Educational and minimalist.
+  Tech stack: PHP 8.3+, Mezzio (PSR-7/PSR-15), FastRoute, Laminas ServiceManager, Symfony Console, RoadRunner, Monolog.
+  Tooling: Pest (tests), PHPStan level 6 (static analysis). `composer check` runs analysis + tests.
+  Layout: src/App (core, middleware, helpers), src/Console (CLI commands), src/Domain (services, repositories),
+  src/Infrastructure (concrete implementations), src/Web/Rest (HTTP handlers), config/ (container, routes); RoadRunner config lives in .rr.yaml, templates/ (*.php.stub generator stubs).
+  Conventions: `declare(strict_types=1);`, PSR-12, return and property type hints on everything, handlers are `final class`.
+  Request flow: Handler -> Service -> Repository, JSON responses via the `jsonResponse()` helper, DI wired in config/container.php, routes in config/routes.php.
+  Commit format: `<type>(<scope>): <description>` with types feat, fix, docs, style, refactor, test, chore.
+  Language: project docs (README) are in Spanish; code, identifiers and commits are in English.
+  Agent tooling folders (.claude, .agents, .codex, etc.) are git-ignored and must never be committed. The openspec/ folder IS tracked.
+
+# Per-artifact rules
+rules:
+  proposal:
+    - Include a "Non-goals" section
+    - Keep each change small and focused on one concern
+  tasks:
+    - Every code task must keep `composer check` passing
+    - Add or update Pest tests for any behavior change
+
+operations:
+  apply:
+    guidance:
+      - Run `composer check` before marking the change complete
+      - Do not commit unless explicitly asked

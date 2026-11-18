@@ -6,13 +6,30 @@
 # Composer
 /vendor/
 composer.phar
-composer.lock
 
 # PHPUnit
 .phpunit.cache/
 .phpunit.result.cache
 coverage/
-phpunit.xml
+
+#############
+# AI agents / tooling
+#############
+.claude/
+.codex/
+.agents/
+.cursor/
+.windsurf/
+.gemini/
+.github/copilot-instructions.md
+.speckit/
+.specify/
+.openspec/
+.aider*
+.continue/
+.roo/
+.clinerules/
+AGENTS.md
 
 # PHPStan
 phpstan.neon.dist

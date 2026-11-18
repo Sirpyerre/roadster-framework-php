@@ -179,8 +179,7 @@ my-api/
 │   └── roadster              # CLI
 ├── config/
 │   ├── container.php         # Dependency injection
-│   ├── routes.php            # Rutas principales
-│   └── roadrunner.yaml       # Config de RoadRunner
+│   └── routes.php            # Rutas principales
 ├── public/
 │   └── index.php             # Entry point
 ├── src/
@@ -190,6 +189,7 @@ my-api/
 │   └── Web/Rest/             # Handlers (endpoints)
 ├── tests/
 ├── .env
+├── .rr.yaml                  # Config de RoadRunner
 └── composer.json
 ```
 

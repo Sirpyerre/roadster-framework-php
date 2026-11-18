@@ -55,4 +55,18 @@ describe('ServeCommand', function () {
 
         expect($definition->hasOption('reload'))->toBeTrue();
     });
+
+    it('ships a RoadRunner config as a regular file', function () {
+        $config = basePath('.rr.yaml');
+
+        expect(is_link($config))->toBeFalse();
+        expect(is_file($config))->toBeTrue();
+        expect(is_readable($config))->toBeTrue();
+
+        $content = (string) file_get_contents($config);
+
+        expect($content)->toContain('version: "3"');
+        expect($content)->toContain('server:');
+        expect($content)->toContain('http:');
+    });
 });

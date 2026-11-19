@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Roadster\Console\Commands;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Roadster\Console\DatabaseMigrations;
 use Roadster\Console\StubWriter;
 use RuntimeException;
@@ -49,8 +47,7 @@ final class MakeMigrationCommand extends Command
         }
 
         $name = ucfirst($name);
-        $timestamp = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('YmdHis');
-        $class = "Version{$timestamp}{$name}";
+        $class = DatabaseMigrations::className($name);
         $target = "database/migrations/{$class}.php";
 
         $writer = new StubWriter($this->basePath, dirname(__DIR__, 3) . '/templates');

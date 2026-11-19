@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Roadster\Console\Commands;
 
+use Roadster\Console\CrudMigration;
+use Roadster\Console\RepositoryDriver;
 use Roadster\Console\StubWriter;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -31,7 +34,8 @@ final class MakeRepositoryCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('name', InputArgument::REQUIRED, 'Resource name in singular (e.g., Invoice or InvoiceRepository)');
+            ->addArgument('name', InputArgument::REQUIRED, 'Resource name in singular (e.g., Invoice or InvoiceRepository)')
+            ->addOption('driver', null, InputOption::VALUE_REQUIRED, 'Repository driver: ' . implode(', ', RepositoryDriver::values()), RepositoryDriver::Dbal->value);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -45,11 +49,20 @@ final class MakeRepositoryCommand extends Command
             return Command::FAILURE;
         }
 
+        $driverName = $input->getOption('driver');
+        $driver = is_string($driverName) ? RepositoryDriver::tryFrom($driverName) : null;
+
+        if ($driver === null) {
+            $io->error(RepositoryDriver::unsupportedMessage(is_string($driverName) ? $driverName : ''));
+            return Command::FAILURE;
+        }
+
         $resource = ucfirst(str_ends_with($name, 'Repository') ? substr($name, 0, -10) : $name);
         $variableName = lcfirst($resource);
 
         $writer = new StubWriter($this->basePath, dirname(__DIR__, 3) . '/templates/crud');
-        $implementation = "src/Infrastructure/{$resource}/Json{$resource}Repository.php";
+        $routeName = strtolower($resource) . 's';
+        $implementation = $driver->repositoryTarget($resource);
 
         // Fail before writing anything so we never leave a half-generated set
         if ($writer->exists($implementation)) {
@@ -60,13 +73,15 @@ final class MakeRepositoryCommand extends Command
         $variables = [
             'resource' => $resource,
             'variableName' => $variableName,
+            'routeName' => $routeName,
+            'repositoryClass' => $driver->repositoryClass($resource),
         ];
 
         // Stub => target; the entity is only created when it is missing
         $files = [
             'Entity.php.stub' => "src/Domain/{$resource}/{$resource}.php",
             'Repository.php.stub' => "src/Domain/{$resource}/{$resource}RepositoryInterface.php",
-            'JsonRepository.php.stub' => $implementation,
+            $driver->repositoryStub() => $implementation,
             'dependencies.php.stub' => "config/dependencies/{$variableName}.php",
         ];
 
@@ -81,12 +96,23 @@ final class MakeRepositoryCommand extends Command
                     $skipped[] = $target;
                 }
             }
+
+            if ($driver->needsMigration()) {
+                $migration = new CrudMigration($this->basePath, $writer);
+                $existing = $migration->existing($routeName);
+
+                if ($existing === null) {
+                    $created[] = $migration->write($routeName);
+                } else {
+                    $skipped[] = $existing;
+                }
+            }
         } catch (RuntimeException $e) {
             $io->error($e->getMessage());
             return Command::FAILURE;
         }
 
-        if (!is_dir($this->basePath . '/storage')) {
+        if ($driver->needsStorageDirectory() && !is_dir($this->basePath . '/storage')) {
             mkdir($this->basePath . '/storage', 0755, true);
         }
 
@@ -99,11 +125,17 @@ final class MakeRepositoryCommand extends Command
             $io->listing($skipped);
         }
 
-        $io->section('Next steps');
-        $io->listing([
+        $nextSteps = [
             "The binding is registered automatically (config/dependencies/{$variableName}.php)",
             "Inject {$resource}RepositoryInterface in your services; it is autowired",
-        ]);
+        ];
+
+        if ($driver->needsMigration()) {
+            $nextSteps[] = 'Create the table: ./bin/roadster migrate';
+        }
+
+        $io->section('Next steps');
+        $io->listing($nextSteps);
 
         return Command::SUCCESS;
     }

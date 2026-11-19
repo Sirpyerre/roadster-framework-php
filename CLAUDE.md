@@ -62,14 +62,17 @@ composer test:coverage
 # Generate middleware
 ./bin/roadster make:middleware Auth
 
-# Generate repository interface + JSON implementation + container binding
+# Generate repository interface + implementation + container binding
+# (--driver=dbal is the default and also generates the table migration; --driver=json for a JSON file)
 ./bin/roadster make:repository Invoice
 
 # Generate a database migration (database/migrations/Version<timestamp><Name>.php)
 ./bin/roadster make:migration CreateProducts
 
 # Generate complete CRUD (5 handlers + service + repository + routes + binding)
+# Default --driver=dbal: DbalProductRepository + a create-table migration (then run `migrate`)
 ./bin/roadster scaffold:crud Product
+./bin/roadster scaffold:crud Product --driver=json   # JSON-file repository, no migration
 
 # List all routes
 ./bin/roadster routes:list
@@ -98,6 +101,7 @@ FastRoute → Handler → Service → Repository → JSON Response
 - **Services** contain business logic, injected into handlers
 - **Repositories** handle data access, injected into services
 - DI configured in `config/container.php` using Laminas ServiceManager. Concrete classes with typed constructor dependencies are autowired (`ReflectionBasedAbstractFactory`); no factory needed
+- Generated DBAL repositories take `Doctrine\DBAL\Connection` (autowired), store timestamps in UTC and map rows through the entity constructor/`toArray()`; their table has only the entity's fields (id, name, created_at, updated_at), so add columns by hand in entity, repository and migration
 - Interface bindings go in `config/dependencies/*.php` (`aliases`/`factories` only), loaded automatically; generators create these files
 - Core routes in `config/routes.php`; per-resource routes in `config/routes/*.php`
 - Database: Doctrine DBAL, parameters built in `config/database.php` from `DB_*` env vars (SQLite `storage/database.sqlite` by default; `mysql` and `pgsql` supported). The container provides a shared lazy `Doctrine\DBAL\Connection` (`config/dependencies/database.php`); repositories are still JSON-backed

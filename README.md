@@ -101,9 +101,11 @@ Edita `up()` y `down()` de la clase generada con `$this->addSql('CREATE TABLE ..
 ./bin/roadster make:handler CreateUser    # Crea handler
 ./bin/roadster make:service UserService   # Crea service
 ./bin/roadster make:middleware Auth       # Crea middleware
-./bin/roadster make:repository Invoice    # Crea interfaz, repositorio JSON y binding
+./bin/roadster make:repository Invoice    # Interfaz, repositorio DBAL, migración y binding
+./bin/roadster make:repository Invoice --driver=json   # Con repositorio en archivo JSON
 ./bin/roadster make:migration CreateInvoices  # Crea una migración de base de datos
-./bin/roadster scaffold:crud Product      # CRUD completo
+./bin/roadster scaffold:crud Product      # CRUD completo (repositorio DBAL por defecto)
+./bin/roadster scaffold:crud Product --driver=json     # CRUD con repositorio en archivo JSON
 ```
 
 ### Utilidades
@@ -119,14 +121,18 @@ Edita `up()` y `down()` de la clase generada con `$this->addSql('CREATE TABLE ..
 ### 1. Genera un CRUD completo
 ```bash
 ./bin/roadster scaffold:crud Task
+./bin/roadster migrate          # crea la tabla `tasks`
 ```
 
 **Esto crea:**
 - ✅ 5 handlers (Index, Create, Show, Update, Delete)
 - ✅ TaskService (lógica de negocio)
-- ✅ TaskRepositoryInterface y JsonTaskRepository (acceso a datos)
+- ✅ TaskRepositoryInterface y DbalTaskRepository (acceso a datos con Doctrine DBAL)
+- ✅ Una migración `Version<fecha>CreateTasksTable` en `database/migrations/`
 - ✅ Rutas en `config/routes/task.php`
 - ✅ Binding del repositorio en `config/dependencies/task.php`
+
+La tabla generada tiene las columnas de la entidad (`id`, `name`, `created_at`, `updated_at`); las fechas se guardan en UTC. Si añades campos, edita a mano la entidad, el repositorio y la migración. Con `--driver=json` se genera `JsonTaskRepository` (archivo en `storage/`) y no hay migración. Los drivers de Doctrine ORM y Cycle ORM llegan más adelante ([ROADMAP](ROADMAP.md)).
 
 ### 2. Nada que registrar
 Las rutas de `config/routes/*.php` y los bindings de `config/dependencies/*.php` se cargan automáticamente. Las clases con dependencias tipadas en el constructor (handlers, servicios) se resuelven solas (autowiring), así que no hay que tocar `config/container.php` ni `config/routes.php`.
@@ -145,7 +151,7 @@ public function create(array $data): Task
 ```bash
 curl -X POST http://localhost:8080/api/tasks \
   -H "Content-Type: application/json" \
-  -d '{"title":"My first task"}'
+  -d '{"name":"My first task"}'
 ```
 
 ---

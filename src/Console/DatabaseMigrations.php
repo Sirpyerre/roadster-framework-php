@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Roadster\Console;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
@@ -31,6 +33,16 @@ final class DatabaseMigrations
             new ConfigurationArray($config),
             $connection !== null ? new ExistingConnection($connection) : new LazyContainerConnection(),
         );
+    }
+
+    /**
+     * Migration class name: `Version<UTC timestamp><Name>` (sorts chronologically).
+     */
+    public static function className(string $name, ?DateTimeImmutable $now = null): string
+    {
+        $now ??= new DateTimeImmutable('now', new DateTimeZone('UTC'));
+
+        return 'Version' . $now->setTimezone(new DateTimeZone('UTC'))->format('YmdHis') . $name;
     }
 
     /**

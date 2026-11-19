@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Roadster\Console\Commands;
 
+use Roadster\Console\CrudMigration;
+use Roadster\Console\RepositoryDriver;
 use Roadster\Console\StubWriter;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -31,7 +34,8 @@ final class ScaffoldCrudCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('resource', InputArgument::REQUIRED, 'Resource name in singular (e.g., Product, User)');
+            ->addArgument('resource', InputArgument::REQUIRED, 'Resource name in singular (e.g., Product, User)')
+            ->addOption('driver', null, InputOption::VALUE_REQUIRED, 'Repository driver: ' . implode(', ', RepositoryDriver::values()), RepositoryDriver::Dbal->value);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -42,6 +46,15 @@ final class ScaffoldCrudCommand extends Command
 
         if (!is_string($resource)) {
             $io->error('Resource name is required');
+            return Command::FAILURE;
+        }
+
+        $driverName = $input->getOption('driver');
+        $driver = is_string($driverName) ? RepositoryDriver::tryFrom($driverName) : null;
+
+        if ($driver === null) {
+            // Validate before writing anything
+            $io->error(RepositoryDriver::unsupportedMessage(is_string($driverName) ? $driverName : ''));
             return Command::FAILURE;
         }
 
@@ -57,10 +70,11 @@ final class ScaffoldCrudCommand extends Command
             'resource' => $resource,
             'variableName' => $variableName,
             'routeName' => $routeName,
+            'repositoryClass' => $driver->repositoryClass($resource),
         ];
 
         // Storage directory used by the JSON repository
-        if (!is_dir($this->basePath . '/storage')) {
+        if ($driver->needsStorageDirectory() && !is_dir($this->basePath . '/storage')) {
             mkdir($this->basePath . '/storage', 0755, true);
         }
 
@@ -77,7 +91,7 @@ final class ScaffoldCrudCommand extends Command
             'Service.php.stub' => "src/Domain/{$resource}/{$resource}Service.php",
             'Repository.php.stub' => "src/Domain/{$resource}/{$resource}RepositoryInterface.php",
             // Infrastructure
-            'JsonRepository.php.stub' => "src/Infrastructure/{$resource}/Json{$resource}Repository.php",
+            $driver->repositoryStub() => $driver->repositoryTarget($resource),
             // Wiring: interface binding and routes are discovered automatically
             'dependencies.php.stub' => "config/dependencies/{$variableName}.php",
             'routes.php.stub' => "config/routes/{$variableName}.php",
@@ -104,6 +118,18 @@ final class ScaffoldCrudCommand extends Command
 
         $io->progressFinish();
 
+        if ($driver->needsMigration()) {
+            $migration = new CrudMigration($this->basePath, $writer);
+            $existing = $migration->existing($routeName);
+
+            if ($existing !== null) {
+                $migrationSkipped = $existing;
+                $io->warning("File already exists, skipping: {$existing}");
+            } else {
+                $createdFiles[] = $migration->write($routeName);
+            }
+        }
+
         // Summary
         $io->newLine();
         $io->success([
@@ -113,12 +139,19 @@ final class ScaffoldCrudCommand extends Command
         $io->section('Created files');
         $io->listing($createdFiles);
 
-        $io->section('Next steps');
-        $io->listing([
+        $nextSteps = [
             "Handlers, service and repository are registered automatically (config/dependencies/{$variableName}.php)",
             "Routes are loaded automatically (config/routes/{$variableName}.php)",
-            "Run: ./bin/roadster routes:list",
-        ]);
+        ];
+
+        if ($driver->needsMigration()) {
+            $nextSteps[] = 'Create the table: ./bin/roadster migrate';
+        }
+
+        $nextSteps[] = 'Run: ./bin/roadster routes:list';
+
+        $io->section('Next steps');
+        $io->listing($nextSteps);
 
         return Command::SUCCESS;
     }

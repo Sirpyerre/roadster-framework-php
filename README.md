@@ -24,7 +24,8 @@ cd my-api
 **Prueba el health check:**
 ```bash
 curl http://localhost:8080/health
-# {"status":"healthy","timestamp":"2025-01-09T10:30:00Z"}
+# {"status":"healthy","timestamp":"2026-01-09T10:30:00+00:00","checks":{"database":"ok"}}
+# Si la base de datos no responde: HTTP 503 con "status":"unhealthy" y "checks":{"database":"error"}
 ```
 
 ---
@@ -46,7 +47,29 @@ curl http://localhost:8080/health
 - PHP 8.3 o superior
 - Extensiones: `json`, `mbstring`
 - Composer 2.x
+- Extensión `pdo` y el driver del motor que uses (`pdo_sqlite` por defecto, `pdo_mysql` o `pdo_pgsql`)
 - RoadRunner 2024.x (se instala automáticamente)
+
+---
+
+## 🗄️ Base de datos
+
+Roadster incluye Doctrine DBAL y una conexión lista para usar. Sin configurar nada usa SQLite en `storage/database.sqlite`. Para cambiar de motor, edita `.env`:
+
+```bash
+DB_CONNECTION=sqlite          # sqlite (por defecto), mysql o pgsql
+DB_DATABASE=storage/database.sqlite   # ruta relativa a la raíz, absoluta o :memory:
+
+# MySQL / PostgreSQL
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=roadster
+# DB_USERNAME=root
+# DB_PASSWORD=
+```
+
+Inyecta `Doctrine\DBAL\Connection` en tus clases: el contenedor la resuelve sola y la comparte, conectando solo en la primera consulta. Los repositorios generados siguen usando archivos JSON; el driver DBAL llega en el [ROADMAP](ROADMAP.md) (`crud-dbal-driver`).
 
 ---
 
@@ -167,6 +190,7 @@ my-api/
 │   └── roadster              # CLI
 ├── config/
 │   ├── container.php         # Dependency injection (autowiring)
+│   ├── database.php          # Parámetros de conexión (desde .env)
 │   ├── dependencies/         # Bindings de interfaces (se cargan solos)
 │   ├── routes/               # Rutas por recurso (se cargan solas)
 │   └── routes.php            # Rutas principales

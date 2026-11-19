@@ -92,6 +92,8 @@ FastRoute → Handler → Service → Repository → JSON Response
 - DI configured in `config/container.php` using Laminas ServiceManager. Concrete classes with typed constructor dependencies are autowired (`ReflectionBasedAbstractFactory`); no factory needed
 - Interface bindings go in `config/dependencies/*.php` (`aliases`/`factories` only), loaded automatically; generators create these files
 - Core routes in `config/routes.php`; per-resource routes in `config/routes/*.php`
+- Database: Doctrine DBAL, parameters built in `config/database.php` from `DB_*` env vars (SQLite `storage/database.sqlite` by default; `mysql` and `pgsql` supported). The container provides a shared lazy `Doctrine\DBAL\Connection` (`config/dependencies/database.php`); repositories are still JSON-backed
+- `/health` runs `SELECT 1` and returns 503 (`status: unhealthy`) if the database fails, never exposing connection details
 - Use `jsonResponse()` helper for JSON responses
 
 ## Code Style

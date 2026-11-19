@@ -114,3 +114,27 @@ describe('ContainerFactory autowiring', function () {
         expect($container->get(\Roadster\Domain\Todo\TodoService::class))->toBe($explicit);
     });
 });
+
+describe('ContainerFactory database connection', function () {
+    it('resolves a DBAL connection from the container', function () {
+        $container = ContainerFactory::create();
+
+        expect($container->get(\Doctrine\DBAL\Connection::class))
+            ->toBeInstanceOf(\Doctrine\DBAL\Connection::class);
+    });
+
+    it('returns the same connection instance every time', function () {
+        $container = ContainerFactory::create();
+
+        expect($container->get(\Doctrine\DBAL\Connection::class))
+            ->toBe($container->get(\Doctrine\DBAL\Connection::class));
+    });
+
+    it('does not connect until a query runs', function () {
+        $connection = ContainerFactory::create()->get(\Doctrine\DBAL\Connection::class);
+
+        expect($connection->isConnected())->toBeFalse();
+        expect($connection->fetchOne('SELECT 1'))->toBe(1);
+        expect($connection->isConnected())->toBeTrue();
+    });
+});

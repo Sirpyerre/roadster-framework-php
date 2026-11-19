@@ -15,7 +15,6 @@ use Laminas\Diactoros\ResponseFactory;
 use Roadster\App\Middleware\BodyParamsMiddleware;
 use Roadster\App\Middleware\ErrorHandlerMiddleware;
 use Roadster\App\Middleware\JsonResponseMiddleware;
-use Roadster\Web\Rest\HealthCheckHandler;
 
 // Get Mezzio default configuration
 $mezzioConfig = (new \Mezzio\ConfigProvider())();
@@ -50,9 +49,6 @@ $dependencies = array_merge_recursive(
             BodyParamsMiddleware::class => InvokableFactory::class,
             ErrorHandlerMiddleware::class => InvokableFactory::class,
             JsonResponseMiddleware::class => InvokableFactory::class,
-
-            // Handlers
-            HealthCheckHandler::class => InvokableFactory::class,
         ],
     ]
 );

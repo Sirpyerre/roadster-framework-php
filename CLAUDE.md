@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Roadster is an ultralight PHP framework optimized for RoadRunner, designed for building high-performance REST APIs. It uses Mezzio (PSR-7/PSR-15), FastRoute for routing, and Symfony Console for CLI commands.
+Roadster is a general-purpose PHP framework for APIs and microservices: Artisan-style scaffolding for quick CRUD apps, and long-lived runtimes (RoadRunner today, optional Swoole later) for high concurrency. It uses Mezzio (PSR-7/PSR-15), FastRoute for routing, and Symfony Console for CLI commands.
 
-**Status**: MVP in development (v0.1)
+**Status**: MVP in development (v0.1). The planned work is broken into small increments in `ROADMAP.md`; each one is an OpenSpec change under `openspec/`.
 
 ## Build and Development Commands
 

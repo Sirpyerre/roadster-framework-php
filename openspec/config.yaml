@@ -2,7 +2,7 @@ schema: spec-driven
 
 # Project context shown to AI when creating artifacts.
 context: |
-  Project: Roadster, an ultralight PHP framework optimized for RoadRunner, built for high-performance REST APIs (MVP, v0.1). Educational and minimalist.
+  Project: Roadster, a general-purpose PHP framework for APIs and microservices (MVP, v0.1): Artisan-style scaffolding for quick CRUD apps, and long-lived runtimes (RoadRunner today, optional Swoole later) for high concurrency. Planned work lives in ROADMAP.md as small increments, one OpenSpec change each.
   Tech stack: PHP 8.3+, Mezzio (PSR-7/PSR-15), FastRoute, Laminas ServiceManager, Symfony Console, RoadRunner, Monolog.
   Tooling: Pest (tests), PHPStan level 6 (static analysis). `composer check` runs analysis + tests.
   Layout: src/App (core, middleware, helpers), src/Console (CLI commands), src/Domain (services, repositories),

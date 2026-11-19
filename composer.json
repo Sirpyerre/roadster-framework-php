@@ -1,6 +1,6 @@
 {
     "name": "roadster/framework",
-    "description": "Ultralight PHP framework with RoadRunner for high-performance APIs",
+    "description": "General-purpose PHP framework for APIs and microservices, with Artisan-style scaffolding and RoadRunner",
     "type": "project",
     "license": "MIT",
     "authors": [

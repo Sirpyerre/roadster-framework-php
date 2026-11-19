@@ -1,8 +1,8 @@
 # 🏎️ Roadster Framework
 
-> **Run like a Roadster** - Ultraligero framework PHP con RoadRunner para APIs de alto rendimiento
+> **Run like a Roadster** - Framework PHP de propósito general para APIs y microservicios
 
-Roadster es un framework minimalista diseñado para crear APIs REST que manejan miles de peticiones por segundo. Powered by RoadRunner, sin complejidad innecesaria.
+Roadster es un framework PHP de propósito general para APIs y microservicios: scaffolding al estilo Artisan para quien necesita un CRUD rápido, y runtimes de larga vida (RoadRunner hoy, Swoole opcional más adelante) para quien necesita alta concurrencia. Mira el [ROADMAP](ROADMAP.md) para ver hacia dónde va.
 
 ---
 
@@ -31,13 +31,13 @@ curl http://localhost:8080/health
 
 ## 🚀 Features
 
-- **🔥 Alto Rendimiento**: 12,000+ req/s con RoadRunner
-- **⚡ Ultraligero**: <10MB de memoria por worker
+- **🔥 Workers de larga vida**: RoadRunner hoy; Swoole opcional en el [ROADMAP](ROADMAP.md)
 - **🛠️ CLI Productivo**: Generadores tipo Laravel Artisan
 - **🏗️ Arquitectura Clara**: Domain-driven design by default
-- **📦 Sin Dependencias**: No requiere servicios externos
+- **📦 Sin servicios externos para empezar**: no necesitas base de datos ni otros servicios para arrancar
+- **🧩 Capa de datos a elección** (en el roadmap): sin ORM (Doctrine DBAL), Doctrine ORM o Cycle ORM
 - **🎯 API-First**: Optimizado para JSON REST APIs
-- **🐳 Docker Ready**: Deploy en contenedores sin fricción
+- **🐳 Docker**: la guía incluye un Dockerfile de ejemplo
 
 ---
 
@@ -115,19 +115,7 @@ curl -X POST http://localhost:8080/api/tasks \
 
 ## 📊 Performance
 
-Benchmark en MacBook Pro M1 (8GB RAM):
-
-| Métrica | Valor |
-|---------|-------|
-| **Requests/segundo** | 12,450 |
-| **Latencia (p50)** | 0.8ms |
-| **Latencia (p95)** | 2.5ms |
-| **Memoria/worker** | 8MB |
-
-**Comparación con otros frameworks:**
-- 🚀 **10x más rápido** que Laravel
-- 🚀 **6x más rápido** que Symfony
-- 🚀 **3x más rápido** que Slim
+Roadster todavía no publica benchmarks. Las cifras que aparecían antes eran estimaciones sin medir y se retiraron. Un benchmark reproducible (carga, versión de PHP, hardware y comparación entre runtimes) llegará con el cambio `benchmark-harness` del [ROADMAP](ROADMAP.md). Hasta entonces, mide con tu propia carga.
 
 ---
 
@@ -196,6 +184,9 @@ my-api/
 ---
 
 ## 🐳 Docker
+
+> Ejemplo de Dockerfile: el repositorio todavía no incluye archivos Docker (no hay `Dockerfile` ni `docker-compose.yml`). Adáptalo a tu proyecto.
+
 ```dockerfile
 FROM php:8.3-cli-alpine
 
@@ -252,68 +243,49 @@ composer check
 
 | Feature | Roadster | Laravel | Symfony | Slim |
 |---------|----------|---------|---------|------|
-| **Req/s** | 12,000+ | 1,200 | 1,800 | 3,400 |
-| **Memory** | 8MB | 45MB | 32MB | 12MB |
-| **Startup** | 0ms | 150ms | 100ms | 50ms |
-| **RoadRunner** | ✅ Nativo | ⚠️ Octane | ⚠️ Manual | ❌ |
-| **CLI** | ✅ Potente | ✅ Artisan | ⚠️ Console | ❌ |
+| **RoadRunner** | ✅ Nativo | ⚠️ Octane | ⚠️ Manual | ⚠️ Manual |
+| **CLI** | ✅ Generadores | ✅ Artisan | ⚠️ Console | ❌ |
 | **Learning Curve** | Baja | Media | Alta | Baja |
+
+Comparación cualitativa: no incluye cifras de rendimiento hasta que exista el benchmark.
 
 ---
 
 ## 💡 ¿Por qué Roadster?
 
 ### ✅ Usa Roadster si:
-- Necesitas **alto rendimiento** en producción
-- Quieres un framework **ligero y rápido** de aprender
-- Construyes **APIs REST** o microservicios
-- Priorizas **simplicidad** sobre features
-- Trabajas con **Kubernetes/Docker**
+- Quieres **scaffolding rápido** (estilo Artisan) para un CRUD o una API REST
+- Construyes **microservicios** que se despliegan en Docker/Kubernetes
+- Necesitas **workers de larga vida** y un camino hacia la **alta concurrencia** (RoadRunner hoy, Swoole opcional más adelante)
+- Quieres **elegir tu capa de datos**: sin ORM o con Doctrine/Cycle (en el roadmap)
+- Priorizas una **arquitectura clara y explícita** (Handler → Service → Repository)
 
 ### ❌ NO uses Roadster si:
-- Necesitas **vistas HTML** (usa Laravel/Symfony)
-- Requieres **ORM complejo** out-of-the-box
-- Quieres **muchos packages** incluidos
+- Necesitas **vistas HTML** o un frontend integrado (usa Laravel/Symfony)
+- Quieres un ecosistema **"todo incluido"** hoy (auth, panel de administración, etc.); varias piezas están en el [ROADMAP](ROADMAP.md)
 - Prefieres **convención sobre configuración** extrema
 
 ---
 
 ## 🗺️ Roadmap
 
-### v0.1 (Beta) - Enero 2025 ✅
-- Core framework
-- CLI básico
-- Templates
-- Documentación
+El plan completo vive en [ROADMAP.md](ROADMAP.md): 17 incrementos pequeños, cada uno un cambio de [OpenSpec](openspec/), agrupados en cuatro fases:
 
-### v0.5 (RC) - Febrero 2025
-- Hot reload automático
-- Route caching
-- Validation helpers
-- Más ejemplos
-
-### v1.0 (Stable) - Marzo 2025
-- Container compilation
-- Metrics/observability
-- Kubernetes manifests
-- Production-ready
-
-### v1.5+ (Future)
-- Swoole support
-- Queue workers
-- WebSocket support
-- Plugin system
+- **A. Fundamentos CRUD**: scaffolding con autoregistro, capa de datos (Doctrine DBAL, SQLite por defecto), migraciones y validación
+- **B. ORM a elección**: sin ORM, Doctrine ORM o Cycle ORM como drivers opcionales
+- **C. Alta concurrencia**: benchmark reproducible, interfaz de runtime y Swoole opcional
+- **D. Microservicios**: observabilidad, readiness checks y colas de trabajos
 
 ---
 
 ## 🌟 Casos de Uso Ideales
 
-- **APIs REST** de alto tráfico
+- **APIs REST** y backends CRUD
 - **Microservicios** en arquitecturas distribuidas
 - **Backends** para aplicaciones móviles
-- **Webhooks processors** con miles de eventos/segundo
+- **Procesadores de webhooks**
 - **Integraciones B2B** que requieren baja latencia
-- **IoT backends** con millones de dispositivos
+- **Backends IoT** (ingesta de eventos)
 
 ---
 

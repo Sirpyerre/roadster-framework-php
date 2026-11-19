@@ -26,6 +26,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 - `container-autoregister`: autowiring del contenedor, `config/dependencies/` y `config/routes/` autocargados, `make:repository` (specs `container-autowiring`, `crud-scaffolding`).
 - `database-foundation`: Doctrine DBAL, `config/database.php`, SQLite por defecto y comprobación de base de datos en `/health` (spec `database-connection`).
 - `database-migrations`: `make:migration`, `migrate`, `migrate:rollback` y `migrate:status` sobre Doctrine Migrations (spec `database-migrations`).
+- `require-php-8-4`: PHP 8.4.1 declarado como versión mínima, acorde con lo que ya exigía `composer.lock`.
 
 ## Incrementos
 

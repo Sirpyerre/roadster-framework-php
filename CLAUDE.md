@@ -107,7 +107,7 @@ FastRoute → Handler → Service → Repository → JSON Response
 
 ## Code Style
 
-- PHP 8.3+ with strict types (`declare(strict_types=1);`)
+- PHP 8.4+ with strict types (`declare(strict_types=1);`)
 - PSR-12 compliant
 - All classes require return type hints and property type hints
 - Handlers should be `final class`

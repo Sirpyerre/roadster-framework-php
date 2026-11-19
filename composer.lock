@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "592e9bf754fb8ca6c39af253c15e122d",
+    "content-hash": "abd60fb3aa1c0479ea1be4a4c8a81e00",
     "packages": [
         {
             "name": "composer/semver",
@@ -4310,12 +4310,12 @@
             "version": "v5.6.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/vlucas/phpdotenv.git",
+                "url": "https://github.com/phpdotenv/phpdotenv.git",
                 "reference": "955e7815d677a3eaa7075231212f2110983adecc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/955e7815d677a3eaa7075231212f2110983adecc",
+                "url": "https://api.github.com/repos/phpdotenv/phpdotenv/zipball/955e7815d677a3eaa7075231212f2110983adecc",
                 "reference": "955e7815d677a3eaa7075231212f2110983adecc",
                 "shasum": ""
             },
@@ -5815,7 +5815,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-30T10:16:31+00:00"
+            "time": "2025-09-30T10:16:31+00:00",
+            "published-time": "2025-09-30T10:16:41+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -7373,7 +7374,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3",
+        "php": "^8.4.1",
         "ext-json": "*",
         "ext-pdo": "*"
     },

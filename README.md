@@ -44,7 +44,7 @@ curl http://localhost:8080/health
 
 ## 📋 Requisitos
 
-- PHP 8.3 o superior
+- PHP 8.4.1 o superior
 - Extensiones: `json`, `mbstring`
 - Composer 2.x
 - Extensión `pdo` y el driver del motor que uses (`pdo_sqlite` por defecto, `pdo_mysql` o `pdo_pgsql`)
@@ -231,7 +231,7 @@ my-api/
 > Ejemplo de Dockerfile: el repositorio todavía no incluye archivos Docker (no hay `Dockerfile` ni `docker-compose.yml`). Adáptalo a tu proyecto.
 
 ```dockerfile
-FROM php:8.3-cli-alpine
+FROM php:8.4-cli-alpine
 
 # Instalar RoadRunner
 RUN wget https://github.com/roadrunner-server/roadrunner/releases/latest/download/roadrunner-linux-amd64 -O /usr/local/bin/rr \

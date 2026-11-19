@@ -84,7 +84,7 @@ final class MakeServiceCommand extends Command
         $io->listing([
             "Inject repositories in the constructor",
             "Add business logic methods",
-            "Register in config/container.php if using dependency injection",
+            "No container registration needed: the service is autowired when its dependencies are typed",
         ]);
 
         return Command::SUCCESS;

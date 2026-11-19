@@ -23,6 +23,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 - `fix-rr-config-symlink`: `.rr.yaml` restaurado como archivo normal, con test de guarda.
 - `align-docs-with-vision`: README, `CLAUDE.md`, `composer.json` y contexto de OpenSpec alineados con la visión; este roadmap.
 - `fix-serve-stop-reload`: comandos `serve:stop`, `serve:reload` y `serve:status` (spec `server-lifecycle`).
+- `container-autoregister`: autowiring del contenedor, `config/dependencies/` y `config/routes/` autocargados, `make:repository` (specs `container-autowiring`, `crud-scaffolding`).
 
 ## Incrementos
 
@@ -31,7 +32,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 | 1 | `fix-rr-config-symlink` | A | Restaurar `.rr.yaml` como archivo normal y añadir un test de guarda | - | hecho |
 | 2 | `align-docs-with-vision` | A | Alinear README, `CLAUDE.md`, `composer.json` y el contexto de OpenSpec con esta visión; crear este roadmap | - | hecho |
 | 3 | `fix-serve-stop-reload` | A | Comandos `serve:stop`, `serve:reload` y `serve:status` que funcionan (archivo pid y RPC local de RoadRunner) | - | hecho |
-| 4 | `container-autoregister` | A | Los generadores registran handlers, servicios y repositorios en el contenedor; `make:repository` | - | planificado |
+| 4 | `container-autoregister` | A | Los generadores registran handlers, servicios y repositorios en el contenedor; `make:repository` | - | hecho |
 | 5 | `database-foundation` | A | Doctrine DBAL (sin ORM), `config/database.php`, variables `.env`, SQLite por defecto y comprobación de base de datos en `/health` | - | planificado |
 | 6 | `database-migrations` | A | `make:migration`, `migrate`, `migrate:rollback`, `migrate:status` | 5 | planificado |
 | 7 | `crud-dbal-driver` | A | `scaffold:crud --driver=dbal` como predeterminado, con migración generada | 4, 5, 6 | planificado |

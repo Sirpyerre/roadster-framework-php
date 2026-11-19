@@ -14,6 +14,11 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // Health check endpoint
     $app->get('/health', HealthCheckHandler::class, 'health');
 
-    // TODO API routes
-    (require configPath('routes/todo.php'))($app, $factory, $container);
+    // Every file in config/routes/ returns a function that registers its routes
+    $routeFiles = glob(configPath('routes/*.php')) ?: [];
+    sort($routeFiles);
+
+    foreach ($routeFiles as $routeFile) {
+        (require $routeFile)($app, $factory, $container);
+    }
 };

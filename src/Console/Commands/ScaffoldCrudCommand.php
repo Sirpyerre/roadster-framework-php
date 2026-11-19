@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Roadster\Console\Commands;
 
+use Roadster\Console\StubWriter;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,6 +19,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class ScaffoldCrudCommand extends Command
 {
+    private readonly string $basePath;
+
+    public function __construct(?string $basePath = null)
+    {
+        $this->basePath = $basePath ?? dirname(__DIR__, 3);
+
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -41,106 +52,52 @@ final class ScaffoldCrudCommand extends Command
 
         $io->title("Scaffolding CRUD for {$resource}");
 
-        $basePath = dirname(__DIR__, 3);
-        $templatesPath = $basePath . '/templates/crud';
-        $createdFiles = [];
-
-        // Create directories
-        $directories = [
-            $basePath . '/src/Web/Rest/' . $resource,
-            $basePath . '/src/Domain/' . $resource,
-            $basePath . '/src/Infrastructure/' . $resource,
-            $basePath . '/config/routes',
-            $basePath . '/storage',
+        $writer = new StubWriter($this->basePath, dirname(__DIR__, 3) . '/templates/crud');
+        $variables = [
+            'resource' => $resource,
+            'variableName' => $variableName,
+            'routeName' => $routeName,
         ];
 
-        foreach ($directories as $dir) {
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
+        // Storage directory used by the JSON repository
+        if (!is_dir($this->basePath . '/storage')) {
+            mkdir($this->basePath . '/storage', 0755, true);
         }
 
-        // Files to generate
+        // Stub => target (relative to the base path)
         $files = [
             // Handlers
-            [
-                'template' => 'IndexHandler.php.stub',
-                'target' => "src/Web/Rest/{$resource}/Index{$resource}Handler.php",
-            ],
-            [
-                'template' => 'CreateHandler.php.stub',
-                'target' => "src/Web/Rest/{$resource}/Create{$resource}Handler.php",
-            ],
-            [
-                'template' => 'ShowHandler.php.stub',
-                'target' => "src/Web/Rest/{$resource}/Show{$resource}Handler.php",
-            ],
-            [
-                'template' => 'UpdateHandler.php.stub',
-                'target' => "src/Web/Rest/{$resource}/Update{$resource}Handler.php",
-            ],
-            [
-                'template' => 'DeleteHandler.php.stub',
-                'target' => "src/Web/Rest/{$resource}/Delete{$resource}Handler.php",
-            ],
+            'IndexHandler.php.stub' => "src/Web/Rest/{$resource}/Index{$resource}Handler.php",
+            'CreateHandler.php.stub' => "src/Web/Rest/{$resource}/Create{$resource}Handler.php",
+            'ShowHandler.php.stub' => "src/Web/Rest/{$resource}/Show{$resource}Handler.php",
+            'UpdateHandler.php.stub' => "src/Web/Rest/{$resource}/Update{$resource}Handler.php",
+            'DeleteHandler.php.stub' => "src/Web/Rest/{$resource}/Delete{$resource}Handler.php",
             // Domain
-            [
-                'template' => 'Entity.php.stub',
-                'target' => "src/Domain/{$resource}/{$resource}.php",
-            ],
-            [
-                'template' => 'Service.php.stub',
-                'target' => "src/Domain/{$resource}/{$resource}Service.php",
-            ],
-            [
-                'template' => 'Repository.php.stub',
-                'target' => "src/Domain/{$resource}/{$resource}RepositoryInterface.php",
-            ],
+            'Entity.php.stub' => "src/Domain/{$resource}/{$resource}.php",
+            'Service.php.stub' => "src/Domain/{$resource}/{$resource}Service.php",
+            'Repository.php.stub' => "src/Domain/{$resource}/{$resource}RepositoryInterface.php",
             // Infrastructure
-            [
-                'template' => 'JsonRepository.php.stub',
-                'target' => "src/Infrastructure/{$resource}/Json{$resource}Repository.php",
-            ],
-            // Routes
-            [
-                'template' => 'routes.php.stub',
-                'target' => "config/routes/{$variableName}.php",
-            ],
+            'JsonRepository.php.stub' => "src/Infrastructure/{$resource}/Json{$resource}Repository.php",
+            // Wiring: interface binding and routes are discovered automatically
+            'dependencies.php.stub' => "config/dependencies/{$variableName}.php",
+            'routes.php.stub' => "config/routes/{$variableName}.php",
         ];
+
+        $createdFiles = [];
 
         $io->progressStart(count($files));
 
-        foreach ($files as $file) {
-            $templateFile = $templatesPath . '/' . $file['template'];
-            $targetFile = $basePath . '/' . $file['target'];
-
-            if (!file_exists($templateFile)) {
-                $io->error("Template not found: {$file['template']}");
+        foreach ($files as $stub => $target) {
+            try {
+                if ($writer->write($stub, $target, $variables)) {
+                    $createdFiles[] = $target;
+                } else {
+                    $io->warning("File already exists, skipping: {$target}");
+                }
+            } catch (RuntimeException $e) {
+                $io->error($e->getMessage());
                 return Command::FAILURE;
             }
-
-            if (file_exists($targetFile)) {
-                $io->warning("File already exists, skipping: {$file['target']}");
-                $io->progressAdvance();
-                continue;
-            }
-
-            $template = file_get_contents($templateFile);
-
-            if ($template === false) {
-                $io->error("Failed to read template: {$file['template']}");
-                return Command::FAILURE;
-            }
-
-            // Replace placeholders
-            $content = str_replace(
-                ['{{resource}}', '{{variableName}}', '{{routeName}}'],
-                [$resource, $variableName, $routeName],
-                $template
-            );
-
-            file_put_contents($targetFile, $content);
-            $createdFiles[] = $file['target'];
 
             $io->progressAdvance();
         }
@@ -158,26 +115,8 @@ final class ScaffoldCrudCommand extends Command
 
         $io->section('Next steps');
         $io->listing([
-            "Include routes in config/routes.php:",
-            "  (require configPath('routes/{$variableName}.php'))(\$app, \$factory, \$container);",
-            "",
-            "Register services in config/container.php:",
-            "  {$resource}Service::class => function (\$container) {",
-            "      return new {$resource}Service(",
-            "          \$container->get({$resource}RepositoryInterface::class)",
-            "      );",
-            "  },",
-            "  {$resource}RepositoryInterface::class => function () {",
-            "      return new Json{$resource}Repository();",
-            "  },",
-            "",
-            "Register handlers in config/container.php:",
-            "  Index{$resource}Handler::class => ...,",
-            "  Create{$resource}Handler::class => ...,",
-            "  Show{$resource}Handler::class => ...,",
-            "  Update{$resource}Handler::class => ...,",
-            "  Delete{$resource}Handler::class => ...,",
-            "",
+            "Handlers, service and repository are registered automatically (config/dependencies/{$variableName}.php)",
+            "Routes are loaded automatically (config/routes/{$variableName}.php)",
             "Run: ./bin/roadster routes:list",
         ]);
 

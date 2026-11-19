@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Mezzio\Application;
 use Mezzio\MiddlewareFactory;
@@ -15,14 +16,6 @@ use Roadster\App\Middleware\BodyParamsMiddleware;
 use Roadster\App\Middleware\ErrorHandlerMiddleware;
 use Roadster\App\Middleware\JsonResponseMiddleware;
 use Roadster\Web\Rest\HealthCheckHandler;
-use Roadster\Web\Rest\Todo\IndexTodoHandler;
-use Roadster\Web\Rest\Todo\CreateTodoHandler;
-use Roadster\Web\Rest\Todo\ShowTodoHandler;
-use Roadster\Web\Rest\Todo\UpdateTodoHandler;
-use Roadster\Web\Rest\Todo\DeleteTodoHandler;
-use Roadster\Domain\Todo\TodoService;
-use Roadster\Domain\Todo\TodoRepositoryInterface;
-use Roadster\Infrastructure\Todo\JsonTodoRepository;
 
 // Get Mezzio default configuration
 $mezzioConfig = (new \Mezzio\ConfigProvider())();
@@ -35,6 +28,10 @@ $dependencies = array_merge_recursive(
     $routerConfig['dependencies'] ?? [],
     $fastRouteConfig['dependencies'] ?? [],
     [
+        // Concrete classes with typed constructor dependencies are autowired
+        'abstract_factories' => [
+            ReflectionBasedAbstractFactory::class,
+        ],
         'factories' => [
             // Override router with FastRoute
             RouterInterface::class => function () {
@@ -56,48 +53,23 @@ $dependencies = array_merge_recursive(
 
             // Handlers
             HealthCheckHandler::class => InvokableFactory::class,
-
-            // Todo API - Repository
-            TodoRepositoryInterface::class => function () {
-                return new JsonTodoRepository();
-            },
-
-            // Todo API - Service
-            TodoService::class => function ($container) {
-                return new TodoService(
-                    $container->get(TodoRepositoryInterface::class)
-                );
-            },
-
-            // Todo API - Handlers
-            IndexTodoHandler::class => function ($container) {
-                return new IndexTodoHandler(
-                    $container->get(TodoService::class)
-                );
-            },
-            CreateTodoHandler::class => function ($container) {
-                return new CreateTodoHandler(
-                    $container->get(TodoService::class)
-                );
-            },
-            ShowTodoHandler::class => function ($container) {
-                return new ShowTodoHandler(
-                    $container->get(TodoService::class)
-                );
-            },
-            UpdateTodoHandler::class => function ($container) {
-                return new UpdateTodoHandler(
-                    $container->get(TodoService::class)
-                );
-            },
-            DeleteTodoHandler::class => function ($container) {
-                return new DeleteTodoHandler(
-                    $container->get(TodoService::class)
-                );
-            },
         ],
     ]
 );
+
+// Interface bindings and extra factories live in config/dependencies/*.php.
+// Files are loaded alphabetically; each may only define 'aliases' and 'factories',
+// and a later file replaces an earlier entry with the same key.
+$dependencyFiles = glob(__DIR__ . '/dependencies/*.php') ?: [];
+sort($dependencyFiles);
+
+foreach ($dependencyFiles as $dependencyFile) {
+    $extra = require $dependencyFile;
+
+    foreach (['aliases', 'factories'] as $section) {
+        $dependencies[$section] = array_replace($dependencies[$section] ?? [], $extra[$section] ?? []);
+    }
+}
 
 return [
     'dependencies' => $dependencies,

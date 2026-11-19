@@ -57,7 +57,10 @@ composer test:coverage
 # Generate middleware
 ./bin/roadster make:middleware Auth
 
-# Generate complete CRUD (5 handlers + service + repository + routes)
+# Generate repository interface + JSON implementation + container binding
+./bin/roadster make:repository Invoice
+
+# Generate complete CRUD (5 handlers + service + repository + routes + binding)
 ./bin/roadster scaffold:crud Product
 
 # List all routes
@@ -86,8 +89,9 @@ FastRoute → Handler → Service → Repository → JSON Response
 - **Handlers** implement `Psr\Http\Server\RequestHandlerInterface`
 - **Services** contain business logic, injected into handlers
 - **Repositories** handle data access, injected into services
-- DI configured in `config/container.php` using Laminas ServiceManager
-- Routes defined in `config/routes.php`
+- DI configured in `config/container.php` using Laminas ServiceManager. Concrete classes with typed constructor dependencies are autowired (`ReflectionBasedAbstractFactory`); no factory needed
+- Interface bindings go in `config/dependencies/*.php` (`aliases`/`factories` only), loaded automatically; generators create these files
+- Core routes in `config/routes.php`; per-resource routes in `config/routes/*.php`
 - Use `jsonResponse()` helper for JSON responses
 
 ## Code Style

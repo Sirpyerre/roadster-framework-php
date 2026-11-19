@@ -7,6 +7,7 @@ namespace Roadster\Console;
 use Roadster\Console\Commands\InitCommand;
 use Roadster\Console\Commands\MakeHandlerCommand;
 use Roadster\Console\Commands\MakeMiddlewareCommand;
+use Roadster\Console\Commands\MakeRepositoryCommand;
 use Roadster\Console\Commands\MakeServiceCommand;
 use Roadster\Console\Commands\RoutesListCommand;
 use Roadster\Console\Commands\ScaffoldCrudCommand;
@@ -42,6 +43,7 @@ final class Application extends SymfonyApplication
             // Generator commands
             new MakeHandlerCommand(),
             new MakeServiceCommand(),
+            new MakeRepositoryCommand(),
             new MakeMiddlewareCommand(),
             new ScaffoldCrudCommand(),
         ]);

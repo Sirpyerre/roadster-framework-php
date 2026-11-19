@@ -68,3 +68,49 @@ describe('ContainerFactory', function () {
         expect($handler)->toBeInstanceOf(HealthCheckHandler::class);
     });
 });
+
+describe('ContainerFactory autowiring', function () {
+    it('resolves the Todo repository interface through config/dependencies', function () {
+        $container = ContainerFactory::create();
+
+        expect($container->get(\Roadster\Domain\Todo\TodoRepositoryInterface::class))
+            ->toBeInstanceOf(\Roadster\Infrastructure\Todo\JsonTodoRepository::class);
+    });
+
+    it('autowires TodoService and the Todo handlers without explicit factories', function () {
+        $container = ContainerFactory::create();
+        $factories = $container->get('config')['dependencies']['factories'];
+
+        $classes = [
+            \Roadster\Domain\Todo\TodoService::class,
+            \Roadster\Web\Rest\Todo\IndexTodoHandler::class,
+            \Roadster\Web\Rest\Todo\CreateTodoHandler::class,
+            \Roadster\Web\Rest\Todo\ShowTodoHandler::class,
+            \Roadster\Web\Rest\Todo\UpdateTodoHandler::class,
+            \Roadster\Web\Rest\Todo\DeleteTodoHandler::class,
+        ];
+
+        foreach ($classes as $class) {
+            expect($factories)->not->toHaveKey($class);
+            expect($container->get($class))->toBeInstanceOf($class);
+        }
+    });
+
+    it('uses the default for optional scalar constructor parameters', function () {
+        $container = ContainerFactory::create();
+
+        // JsonTodoRepository::__construct(?string $filePath = null)
+        expect($container->get(\Roadster\Infrastructure\Todo\JsonTodoRepository::class))
+            ->toBeInstanceOf(\Roadster\Infrastructure\Todo\JsonTodoRepository::class);
+    });
+
+    it('lets an explicit factory override autowiring', function () {
+        $explicit = new \stdClass();
+        $config = ContainerFactory::create()->get('config')['dependencies'];
+        $config['factories'][\Roadster\Domain\Todo\TodoService::class] = fn () => $explicit;
+
+        $container = new \Laminas\ServiceManager\ServiceManager($config);
+
+        expect($container->get(\Roadster\Domain\Todo\TodoService::class))->toBe($explicit);
+    });
+});

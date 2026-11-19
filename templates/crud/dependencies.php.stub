@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+use Roadster\Domain\{{resource}}\{{resource}}RepositoryInterface;
+use Roadster\Infrastructure\{{resource}}\Json{{resource}}Repository;
+
+return [
+    'aliases' => [
+        {{resource}}RepositoryInterface::class => Json{{resource}}Repository::class,
+    ],
+];

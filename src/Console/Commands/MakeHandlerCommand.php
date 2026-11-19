@@ -89,9 +89,9 @@ final class MakeHandlerCommand extends Command
 
         $io->section('Next steps');
         $io->listing([
-            "Add route in config/routes.php:",
+            "Add a route in a file under config/routes/ (every file there is loaded):",
             "  \$app->get('/api/endpoint', {$className}Handler::class, 'endpoint.name');",
-            "Register dependencies in config/container.php (if needed)",
+            "Constructor dependencies with typed classes/interfaces are autowired; no container registration needed",
         ]);
 
         return Command::SUCCESS;

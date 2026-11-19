@@ -65,6 +65,7 @@ curl http://localhost:8080/health
 ./bin/roadster make:handler CreateUser    # Crea handler
 ./bin/roadster make:service UserService   # Crea service
 ./bin/roadster make:middleware Auth       # Crea middleware
+./bin/roadster make:repository Invoice    # Crea interfaz, repositorio JSON y binding
 ./bin/roadster scaffold:crud Product      # CRUD completo
 ```
 
@@ -86,14 +87,12 @@ curl http://localhost:8080/health
 **Esto crea:**
 - ✅ 5 handlers (Index, Create, Show, Update, Delete)
 - ✅ TaskService (lógica de negocio)
-- ✅ TaskRepository (acceso a datos)
-- ✅ Rutas configuradas
+- ✅ TaskRepositoryInterface y JsonTaskRepository (acceso a datos)
+- ✅ Rutas en `config/routes/task.php`
+- ✅ Binding del repositorio en `config/dependencies/task.php`
 
-### 2. Agrega las rutas
-```php
-// config/routes.php
-require __DIR__ . '/routes/task.php';
-```
+### 2. Nada que registrar
+Las rutas de `config/routes/*.php` y los bindings de `config/dependencies/*.php` se cargan automáticamente. Las clases con dependencias tipadas en el constructor (handlers, servicios) se resuelven solas (autowiring), así que no hay que tocar `config/container.php` ni `config/routes.php`.
 
 ### 3. Implementa la lógica
 ```php
@@ -167,7 +166,9 @@ my-api/
 ├── bin/
 │   └── roadster              # CLI
 ├── config/
-│   ├── container.php         # Dependency injection
+│   ├── container.php         # Dependency injection (autowiring)
+│   ├── dependencies/         # Bindings de interfaces (se cargan solos)
+│   ├── routes/               # Rutas por recurso (se cargan solas)
 │   └── routes.php            # Rutas principales
 ├── public/
 │   └── index.php             # Entry point

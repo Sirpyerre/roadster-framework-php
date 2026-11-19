@@ -55,8 +55,9 @@ curl http://localhost:8080/health
 ### Servidor
 ```bash
 ./bin/roadster serve              # Inicia RoadRunner
+./bin/roadster serve:status       # Indica si el servidor corre (y su pid)
+./bin/roadster serve:reload       # Recarga los workers sin detener el servidor
 ./bin/roadster serve:stop         # Detiene el servidor
-./bin/roadster serve:reload       # Recarga workers (hot reload)
 ```
 
 ### Generadores

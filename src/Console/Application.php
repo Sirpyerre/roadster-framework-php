@@ -11,6 +11,9 @@ use Roadster\Console\Commands\MakeServiceCommand;
 use Roadster\Console\Commands\RoutesListCommand;
 use Roadster\Console\Commands\ScaffoldCrudCommand;
 use Roadster\Console\Commands\ServeCommand;
+use Roadster\Console\Commands\ServeReloadCommand;
+use Roadster\Console\Commands\ServeStatusCommand;
+use Roadster\Console\Commands\ServeStopCommand;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
 final class Application extends SymfonyApplication
@@ -31,6 +34,9 @@ final class Application extends SymfonyApplication
             // Server commands
             new InitCommand(),
             new ServeCommand(),
+            new ServeStopCommand(),
+            new ServeReloadCommand(),
+            new ServeStatusCommand(),
             new RoutesListCommand(),
 
             // Generator commands

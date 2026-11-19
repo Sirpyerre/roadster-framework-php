@@ -42,18 +42,11 @@ describe('ServeCommand', function () {
         expect($definition->hasOption('debug'))->toBeTrue();
     });
 
-    it('has stop option', function () {
-        $command = new ServeCommand();
-        $definition = $command->getDefinition();
+    it('no longer has stop or reload options', function () {
+        $definition = (new ServeCommand())->getDefinition();
 
-        expect($definition->hasOption('stop'))->toBeTrue();
-    });
-
-    it('has reload option', function () {
-        $command = new ServeCommand();
-        $definition = $command->getDefinition();
-
-        expect($definition->hasOption('reload'))->toBeTrue();
+        expect($definition->hasOption('stop'))->toBeFalse();
+        expect($definition->hasOption('reload'))->toBeFalse();
     });
 
     it('ships a RoadRunner config as a regular file', function () {
@@ -68,5 +61,7 @@ describe('ServeCommand', function () {
         expect($content)->toContain('version: "3"');
         expect($content)->toContain('server:');
         expect($content)->toContain('http:');
+        expect($content)->toContain('rpc:');
+        expect($content)->toContain('tcp://127.0.0.1:${RR_RPC_PORT:-6001}');
     });
 });

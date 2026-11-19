@@ -21,9 +21,10 @@ composer install
 ./bin/roadster serve
 ./bin/roadster serve --port=8080 --workers=4
 
-# Stop/reload server
-./bin/roadster serve:stop
+# Server status / reload workers / stop
+./bin/roadster serve:status
 ./bin/roadster serve:reload
+./bin/roadster serve:stop
 
 # Run all checks (static analysis + tests)
 composer check

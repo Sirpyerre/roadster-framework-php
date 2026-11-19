@@ -4,6 +4,9 @@ server:
   command: "php public/index.php"
   relay: pipes
 
+rpc:
+  listen: "tcp://127.0.0.1:${RR_RPC_PORT:-6001}"
+
 http:
   address: "${SERVER_HOST:-0.0.0.0}:${SERVER_PORT:-8080}"
   middleware: []

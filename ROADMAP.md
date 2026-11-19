@@ -22,6 +22,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 - `harden-json-repository`: almacenamiento JSON con bloqueo, escritura atómica y errores explícitos (spec `json-file-persistence`).
 - `fix-rr-config-symlink`: `.rr.yaml` restaurado como archivo normal, con test de guarda.
 - `align-docs-with-vision`: README, `CLAUDE.md`, `composer.json` y contexto de OpenSpec alineados con la visión; este roadmap.
+- `fix-serve-stop-reload`: comandos `serve:stop`, `serve:reload` y `serve:status` (spec `server-lifecycle`).
 
 ## Incrementos
 
@@ -29,7 +30,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 |---|---|---|---|---|---|
 | 1 | `fix-rr-config-symlink` | A | Restaurar `.rr.yaml` como archivo normal y añadir un test de guarda | - | hecho |
 | 2 | `align-docs-with-vision` | A | Alinear README, `CLAUDE.md`, `composer.json` y el contexto de OpenSpec con esta visión; crear este roadmap | - | hecho |
-| 3 | `fix-serve-stop-reload` | A | Hacer que `serve --stop` y `--reload` funcionen (RoadRunner necesita un archivo pid que `ServeCommand` no crea) y corregir la documentación que menciona `serve:stop` y `serve:reload`, que no son comandos reales | - | planificado |
+| 3 | `fix-serve-stop-reload` | A | Comandos `serve:stop`, `serve:reload` y `serve:status` que funcionan (archivo pid y RPC local de RoadRunner) | - | hecho |
 | 4 | `container-autoregister` | A | Los generadores registran handlers, servicios y repositorios en el contenedor; `make:repository` | - | planificado |
 | 5 | `database-foundation` | A | Doctrine DBAL (sin ORM), `config/database.php`, variables `.env`, SQLite por defecto y comprobación de base de datos en `/health` | - | planificado |
 | 6 | `database-migrations` | A | `make:migration`, `migrate`, `migrate:rollback`, `migrate:status` | 5 | planificado |
@@ -44,6 +45,10 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 | 15 | `observability` | D | Monolog conectado, request-id y métricas de RoadRunner | - | planificado |
 | 16 | `readiness-checks` | D | Endpoint `/ready` que comprueba la base de datos y dependencias | 5 | planificado |
 | 17 | `jobs-queue` | D | Colas con el plugin `jobs` de RoadRunner y `make:job` | 4 | planificado |
+
+## Ideas futuras
+
+- `serve:restart`: detener y volver a arrancar el servidor (como `octane:restart`). Hoy `serve:reload` recarga los workers sin cortar conexiones; `restart` necesita un modo daemon/segundo plano para `serve`, así que se decide cuando exista ese modo.
 
 ## Elección de capa de datos
 

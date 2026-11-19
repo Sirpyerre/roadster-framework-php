@@ -21,6 +21,11 @@ composer install
 ./bin/roadster serve
 ./bin/roadster serve --port=8080 --workers=4
 
+# Database migrations (Doctrine Migrations, table `migrations`)
+./bin/roadster migrate            # run pending migrations
+./bin/roadster migrate:rollback   # revert the last executed migration
+./bin/roadster migrate:status
+
 # Server status / reload workers / stop
 ./bin/roadster serve:status
 ./bin/roadster serve:reload
@@ -60,6 +65,9 @@ composer test:coverage
 # Generate repository interface + JSON implementation + container binding
 ./bin/roadster make:repository Invoice
 
+# Generate a database migration (database/migrations/Version<timestamp><Name>.php)
+./bin/roadster make:migration CreateProducts
+
 # Generate complete CRUD (5 handlers + service + repository + routes + binding)
 ./bin/roadster scaffold:crud Product
 
@@ -93,6 +101,7 @@ FastRoute → Handler → Service → Repository → JSON Response
 - Interface bindings go in `config/dependencies/*.php` (`aliases`/`factories` only), loaded automatically; generators create these files
 - Core routes in `config/routes.php`; per-resource routes in `config/routes/*.php`
 - Database: Doctrine DBAL, parameters built in `config/database.php` from `DB_*` env vars (SQLite `storage/database.sqlite` by default; `mysql` and `pgsql` supported). The container provides a shared lazy `Doctrine\DBAL\Connection` (`config/dependencies/database.php`); repositories are still JSON-backed
+- Migrations: `config/migrations.php`, classes in `database/migrations/` (namespace `Database\Migrations`, loaded by Doctrine's finder, not Composer). The commands get the DB connection lazily, so other CLI commands never need valid `DB_*`. MySQL has no transactional DDL
 - `/health` runs `SELECT 1` and returns 503 (`status: unhealthy`) if the database fails, never exposing connection details
 - Use `jsonResponse()` helper for JSON responses
 

@@ -25,6 +25,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 - `fix-serve-stop-reload`: comandos `serve:stop`, `serve:reload` y `serve:status` (spec `server-lifecycle`).
 - `container-autoregister`: autowiring del contenedor, `config/dependencies/` y `config/routes/` autocargados, `make:repository` (specs `container-autowiring`, `crud-scaffolding`).
 - `database-foundation`: Doctrine DBAL, `config/database.php`, SQLite por defecto y comprobación de base de datos en `/health` (spec `database-connection`).
+- `database-migrations`: `make:migration`, `migrate`, `migrate:rollback` y `migrate:status` sobre Doctrine Migrations (spec `database-migrations`).
 
 ## Incrementos
 
@@ -35,7 +36,7 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 | 3 | `fix-serve-stop-reload` | A | Comandos `serve:stop`, `serve:reload` y `serve:status` que funcionan (archivo pid y RPC local de RoadRunner) | - | hecho |
 | 4 | `container-autoregister` | A | Los generadores registran handlers, servicios y repositorios en el contenedor; `make:repository` | - | hecho |
 | 5 | `database-foundation` | A | Doctrine DBAL (sin ORM), `config/database.php`, variables `.env`, SQLite por defecto y comprobación de base de datos en `/health` | - | hecho |
-| 6 | `database-migrations` | A | `make:migration`, `migrate`, `migrate:rollback`, `migrate:status` | 5 | planificado |
+| 6 | `database-migrations` | A | `make:migration`, `migrate`, `migrate:rollback`, `migrate:status` | 5 | hecho |
 | 7 | `crud-dbal-driver` | A | `scaffold:crud --driver=dbal` como predeterminado, con migración generada | 4, 5, 6 | planificado |
 | 8 | `request-validation` | A | `make:request` y respuestas 422 uniformes | - | planificado |
 | 9 | `worker-reset-hook` | B | Servicios "reiniciables" entre peticiones en el bucle del worker | - | planificado |

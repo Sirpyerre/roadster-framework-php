@@ -71,6 +71,19 @@ DB_DATABASE=storage/database.sqlite   # ruta relativa a la raíz, absoluta o :me
 
 Inyecta `Doctrine\DBAL\Connection` en tus clases: el contenedor la resuelve sola y la comparte, conectando solo en la primera consulta. Los repositorios generados siguen usando archivos JSON; el driver DBAL llega en el [ROADMAP](ROADMAP.md) (`crud-dbal-driver`).
 
+### Migraciones
+
+Las migraciones usan [Doctrine Migrations](https://www.doctrine-project.org/projects/migrations.html) y viven en `database/migrations/`:
+
+```bash
+./bin/roadster make:migration CreateProducts   # Crea database/migrations/Version<fecha>CreateProducts.php
+./bin/roadster migrate                         # Ejecuta las migraciones pendientes, en orden
+./bin/roadster migrate:rollback                # Revierte la última migración ejecutada
+./bin/roadster migrate:status                  # Ejecutadas, disponibles, pendientes y versiones
+```
+
+Edita `up()` y `down()` de la clase generada con `$this->addSql('CREATE TABLE ...')`. El historial se guarda en la tabla `migrations`. Si una migración falla no se registra y, en SQLite y PostgreSQL, se revierte todo lo de esa ejecución. MySQL no admite DDL transaccional, así que una migración fallida puede dejar cambios parciales.
+
 ---
 
 ## 🛠️ Comandos CLI
@@ -89,6 +102,7 @@ Inyecta `Doctrine\DBAL\Connection` en tus clases: el contenedor la resuelve sola
 ./bin/roadster make:service UserService   # Crea service
 ./bin/roadster make:middleware Auth       # Crea middleware
 ./bin/roadster make:repository Invoice    # Crea interfaz, repositorio JSON y binding
+./bin/roadster make:migration CreateInvoices  # Crea una migración de base de datos
 ./bin/roadster scaffold:crud Product      # CRUD completo
 ```
 
@@ -191,9 +205,12 @@ my-api/
 ├── config/
 │   ├── container.php         # Dependency injection (autowiring)
 │   ├── database.php          # Parámetros de conexión (desde .env)
+│   ├── migrations.php        # Configuración de migraciones
 │   ├── dependencies/         # Bindings de interfaces (se cargan solos)
 │   ├── routes/               # Rutas por recurso (se cargan solas)
 │   └── routes.php            # Rutas principales
+├── database/
+│   └── migrations/           # Migraciones de base de datos
 ├── public/
 │   └── index.php             # Entry point
 ├── src/

@@ -4,6 +4,50 @@
 
 Roadster es un framework PHP de propósito general para APIs y microservicios: scaffolding al estilo Artisan para quien necesita un CRUD rápido, y runtimes de larga vida (RoadRunner hoy, Swoole opcional más adelante) para quien necesita alta concurrencia. Mira el [ROADMAP](ROADMAP.md) para ver hacia dónde va.
 
+**De cero a una API con base de datos en tres comandos:**
+
+```bash
+./bin/roadster scaffold:crud Product   # handlers, servicio, repositorio DBAL, rutas y migración
+./bin/roadster migrate                 # crea la tabla
+./bin/roadster serve                   # GET/POST/PUT/DELETE /api/products funcionando
+```
+
+Sin registrar nada a mano, sin instalar una base de datos (SQLite viene por defecto) y con una arquitectura que no te encierra: el dominio depende de interfaces, así que cambiar de SQLite a MySQL o PostgreSQL es cuestión de `.env`.
+
+> **Estado: MVP en desarrollo (v0.1).** La base CRUD ya funciona de punta a punta; la validación, los ORM opcionales, Swoole y las colas aún no existen. Más abajo está el detalle de lo que hay y lo que falta.
+
+---
+
+## ✅ Estado del proyecto
+
+Roadster avanza en incrementos pequeños, cada uno especificado y probado antes de darse por hecho ([ROADMAP](ROADMAP.md), 7 de 17 completados).
+
+### Ya disponible
+
+| Área | Qué incluye |
+|------|-------------|
+| **Servidor** | RoadRunner con `serve`, `serve:status`, `serve:reload` (recarga workers sin cortar conexiones) y `serve:stop` |
+| **Scaffolding** | `make:handler`, `make:service`, `make:middleware`, `make:repository`, `make:migration` y `scaffold:crud` |
+| **Datos** | Doctrine DBAL con SQLite por defecto, MySQL y PostgreSQL por `.env`; conexión compartida y perezosa |
+| **Migraciones** | Doctrine Migrations: `migrate`, `migrate:rollback`, `migrate:status` |
+| **CRUD generado** | Repositorio DBAL (o JSON con `--driver=json`) con su migración, rutas y binding, todo cargado automáticamente |
+| **Contenedor** | Autowiring de clases con dependencias tipadas; `config/dependencies/` y `config/routes/` se descubren solos |
+| **Operación** | `/health` comprueba la base de datos y responde 503 sin filtrar detalles de conexión |
+| **Calidad** | Suite de tests con Pest, PHPStan nivel 6, PHP 8.4+ con `strict_types` |
+
+### En camino
+
+- **Validación de peticiones** con respuestas 422 uniformes y `make:request`
+- **Drivers de ORM opcionales**: Doctrine ORM y Cycle ORM
+- **Alta concurrencia**: benchmark reproducible, interfaz de runtime y Swoole opcional
+- **Microservicios**: observabilidad, `/ready` y colas de trabajos
+
+### Lo que aún no hay
+
+- Benchmarks publicados: no citamos cifras hasta poder reproducirlas
+- Autenticación, panel de administración y otras piezas "todo incluido"
+- El repositorio de ejemplo `Todo` sigue usando archivos JSON
+
 ---
 
 ## ⚡ Quick Start
@@ -33,10 +77,11 @@ curl http://localhost:8080/health
 ## 🚀 Features
 
 - **🔥 Workers de larga vida**: RoadRunner hoy; Swoole opcional en el [ROADMAP](ROADMAP.md)
-- **🛠️ CLI Productivo**: Generadores tipo Laravel Artisan
+- **🛠️ CLI Productivo**: Generadores tipo Laravel Artisan, con migraciones incluidas
 - **🏗️ Arquitectura Clara**: Domain-driven design by default
-- **📦 Sin servicios externos para empezar**: no necesitas base de datos ni otros servicios para arrancar
-- **🧩 Capa de datos a elección** (en el roadmap): sin ORM (Doctrine DBAL), Doctrine ORM o Cycle ORM
+- **📦 Sin servicios externos para empezar**: SQLite por defecto, sin instalar nada más para arrancar
+- **🗄️ Doctrine DBAL y migraciones**: SQLite, MySQL o PostgreSQL con solo cambiar `.env`
+- **🧩 ORM a elección** (en el roadmap): Doctrine ORM o Cycle ORM como drivers opcionales
 - **🎯 API-First**: Optimizado para JSON REST APIs
 - **🐳 Docker**: la guía incluye un Dockerfile de ejemplo
 
@@ -69,7 +114,7 @@ DB_DATABASE=storage/database.sqlite   # ruta relativa a la raíz, absoluta o :me
 # DB_PASSWORD=
 ```
 
-Inyecta `Doctrine\DBAL\Connection` en tus clases: el contenedor la resuelve sola y la comparte, conectando solo en la primera consulta. Los repositorios generados siguen usando archivos JSON; el driver DBAL llega en el [ROADMAP](ROADMAP.md) (`crud-dbal-driver`).
+Inyecta `Doctrine\DBAL\Connection` en tus clases: el contenedor la resuelve sola y la comparte, conectando solo en la primera consulta. Los repositorios generados usan DBAL por defecto (con `--driver=json` se generan sobre archivos JSON).
 
 ### Migraciones
 
@@ -275,16 +320,6 @@ composer analyse
 # Todo junto
 composer check
 ```
-
----
-
-## 📚 Documentación
-
-- [Installation Guide](docs/installation.md)
-- [Tutorial](docs/tutorial.md)
-- [Architecture](docs/architecture.md)
-- [CLI Reference](docs/cli.md)
-- [Deployment](docs/deployment.md)
 
 ---
 

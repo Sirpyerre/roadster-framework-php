@@ -55,6 +55,8 @@ Roadster es un framework PHP de propósito general para APIs y microservicios. Q
 
 - `serve:restart`: detener y volver a arrancar el servidor (como `octane:restart`). Hoy `serve:reload` recarga los workers sin cortar conexiones; `restart` necesita un modo daemon/segundo plano para `serve`, así que se decide cuando exista ese modo.
 
+- Carpeta `docs/` con guías: instalación, tutorial, arquitectura, referencia de la CLI y despliegue. El README las enlazaba antes de que existieran y se retiró el enlace; hoy la documentación vive en el propio README. Se retoma cuando la API se estabilice.
+
 ## Elección de capa de datos
 
 El dominio sigue dependiendo de interfaces de repositorio; la implementación es un detalle de infraestructura:
